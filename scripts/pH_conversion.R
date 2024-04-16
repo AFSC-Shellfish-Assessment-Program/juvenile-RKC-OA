@@ -58,18 +58,19 @@ ggplot(dat3, aes(pH, fill = Treatment.pH)) +
   coord_cartesian(xlim = c(7.6, 8.1)) +
   ggtitle("2017 pH treatments (free scale)")
 
-# change dat3 "Ambient" to "control
+# change dat3 "Ambient" to "control" 
 change <- dat3$Treatment.pH == "Ambient"
 dat3$Treatment.pH[change] <- "Control"
 
 # combine and plot
 dat2 <- dat2 %>%
-  select(Treatment, pH) %>%
+  select(Treatment, pH, Temperature) %>%
   mutate(Year = 2013)
 
 dat3 <- dat3 %>%
-  select(Treatment.pH, pH) %>%
-  rename(Treatment = Treatment.pH) %>%
+  select(Treatment.pH, pH, Temp.C) %>%
+  rename(Treatment = Treatment.pH,
+         Temperature = Temp.C) %>%
   mutate(Year = 2017)
 
 dat.both <- rbind(dat2, dat3)
@@ -87,3 +88,13 @@ ggplot(dat.both, aes(`pH (free scale)`, fill = Treatment)) +
   coord_cartesian(xlim = c(7.4, 8.15)) 
 
 ggsave("./figs/pH_treatments_2013_2017.png", units = 'in', width = 5, height = 5)
+
+# plot pH and temp
+
+ggplot(filter(dat.both, `pH (free scale)` > 7.1), aes(Temperature, `pH (free scale)`, color = as.factor(Year))) +
+  geom_point(alpha = 0.5, size = 1) +
+  facet_wrap(~Treatment) +
+  scale_color_manual(values = cb[c(2,4)])
+
+
+ggsave("./figs/pH_treatments_pH_temp_2013_2017.png", units = 'in', width = 8, height = 5)
